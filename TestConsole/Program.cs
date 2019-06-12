@@ -19,7 +19,8 @@ namespace TestConsole
                 foreach(var u in users)
                 {
                     Console.WriteLine(u.Name);
-                }            
+                }
+                Console.ReadLine();
             }
         }
     }

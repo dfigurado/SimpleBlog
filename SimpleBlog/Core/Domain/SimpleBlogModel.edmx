@@ -5,7 +5,7 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="SimpleBlogModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="BlogPosts">
+        <EntityType Name="BlogPost">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -31,14 +31,16 @@
           <Property Name="RoleId" Type="int" Nullable="false" />
           <Property Name="IsActive" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="UserRoles">
+        <EntityType Name="UserRole">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="RoleName" Type="nvarchar" MaxLength="50" />
         </EntityType>
-        <EntityType Name="UserWorkFlowRoles">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SimpleBlog.dbo.UserWorkFlowRole' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="UserWorkFlowRole">
           <Key>
             <PropertyRef Name="UserRoleId" />
             <PropertyRef Name="WorkFlowStepId" />
@@ -46,7 +48,7 @@
           <Property Name="UserRoleId" Type="int" Nullable="false" />
           <Property Name="WorkFlowStepId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="WorkFlowSteps">
+        <EntityType Name="WorkFlowStep">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -55,33 +57,33 @@
         </EntityType>
         <Association Name="FK_BlogPost_BlogUsers">
           <End Role="BlogUsers" Type="Self.BlogUsers" Multiplicity="1" />
-          <End Role="BlogPosts" Type="Self.BlogPosts" Multiplicity="*" />
+          <End Role="BlogPost" Type="Self.BlogPost" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="BlogUsers">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="BlogPosts">
+            <Dependent Role="BlogPost">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_BlogPost_WorkFlowStep">
-          <End Role="WorkFlowSteps" Type="Self.WorkFlowSteps" Multiplicity="1" />
-          <End Role="BlogPosts" Type="Self.BlogPosts" Multiplicity="*" />
+          <End Role="WorkFlowStep" Type="Self.WorkFlowStep" Multiplicity="1" />
+          <End Role="BlogPost" Type="Self.BlogPost" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="WorkFlowSteps">
+            <Principal Role="WorkFlowStep">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="BlogPosts">
+            <Dependent Role="BlogPost">
               <PropertyRef Name="WorkFlowId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_BlogUsers_Profiles">
-          <End Role="UserRoles" Type="Self.UserRoles" Multiplicity="1" />
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
           <End Role="BlogUsers" Type="Self.BlogUsers" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="UserRoles">
+            <Principal Role="UserRole">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="BlogUsers">
@@ -90,58 +92,59 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_UserWorkFlowRole_UserRole">
-          <End Role="UserRoles" Type="Self.UserRoles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="UserWorkFlowRoles" Type="Self.UserWorkFlowRoles" Multiplicity="*" />
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
+          <End Role="UserWorkFlowRole" Type="Self.UserWorkFlowRole" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="UserRoles">
+            <Principal Role="UserRole">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="UserWorkFlowRoles">
+            <Dependent Role="UserWorkFlowRole">
               <PropertyRef Name="UserRoleId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_UserWorkFlowRole_WorkFlowStep">
-          <End Role="WorkFlowSteps" Type="Self.WorkFlowSteps" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="UserWorkFlowRoles" Type="Self.UserWorkFlowRoles" Multiplicity="*" />
+          <End Role="WorkFlowStep" Type="Self.WorkFlowStep" Multiplicity="1" />
+          <End Role="UserWorkFlowRole" Type="Self.UserWorkFlowRole" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="WorkFlowSteps">
+            <Principal Role="WorkFlowStep">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="UserWorkFlowRoles">
+            <Dependent Role="UserWorkFlowRole">
               <PropertyRef Name="WorkFlowStepId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SimpleBlogModelStoreContainer">
-          <EntitySet Name="BlogPosts" EntityType="Self.BlogPosts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BlogPost" EntityType="Self.BlogPost" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BlogUsers" EntityType="Self.BlogUsers" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="UserRoles" EntityType="Self.UserRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="UserWorkFlowRoles" EntityType="Self.UserWorkFlowRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="WorkFlowSteps" EntityType="Self.WorkFlowSteps" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserRole" EntityType="Self.UserRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="WorkFlowStep" EntityType="Self.WorkFlowStep" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserWorkFlowRole" EntityType="Self.UserWorkFlowRole" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [UserWorkFlowRole].[UserRoleId] AS [UserRoleId], 
+    [UserWorkFlowRole].[WorkFlowStepId] AS [WorkFlowStepId]
+    FROM [dbo].[UserWorkFlowRole] AS [UserWorkFlowRole]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_BlogPost_BlogUsers" Association="Self.FK_BlogPost_BlogUsers">
             <End Role="BlogUsers" EntitySet="BlogUsers" />
-            <End Role="BlogPosts" EntitySet="BlogPosts" />
+            <End Role="BlogPost" EntitySet="BlogPost" />
           </AssociationSet>
           <AssociationSet Name="FK_BlogPost_WorkFlowStep" Association="Self.FK_BlogPost_WorkFlowStep">
-            <End Role="WorkFlowSteps" EntitySet="WorkFlowSteps" />
-            <End Role="BlogPosts" EntitySet="BlogPosts" />
+            <End Role="WorkFlowStep" EntitySet="WorkFlowStep" />
+            <End Role="BlogPost" EntitySet="BlogPost" />
           </AssociationSet>
           <AssociationSet Name="FK_BlogUsers_Profiles" Association="Self.FK_BlogUsers_Profiles">
-            <End Role="UserRoles" EntitySet="UserRoles" />
+            <End Role="UserRole" EntitySet="UserRole" />
             <End Role="BlogUsers" EntitySet="BlogUsers" />
           </AssociationSet>
           <AssociationSet Name="FK_UserWorkFlowRole_UserRole" Association="Self.FK_UserWorkFlowRole_UserRole">
-            <End Role="UserRoles" EntitySet="UserRoles" />
-            <End Role="UserWorkFlowRoles" EntitySet="UserWorkFlowRoles" />
+            <End Role="UserRole" EntitySet="UserRole" />
+            <End Role="UserWorkFlowRole" EntitySet="UserWorkFlowRole" />
           </AssociationSet>
           <AssociationSet Name="FK_UserWorkFlowRole_WorkFlowStep" Association="Self.FK_UserWorkFlowRole_WorkFlowStep">
-            <End Role="WorkFlowSteps" EntitySet="WorkFlowSteps" />
-            <End Role="UserWorkFlowRoles" EntitySet="UserWorkFlowRoles" />
+            <End Role="WorkFlowStep" EntitySet="WorkFlowStep" />
+            <End Role="UserWorkFlowRole" EntitySet="UserWorkFlowRole" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -162,8 +165,8 @@
           <Property Name="IsArchived" Type="Boolean" Nullable="false" />
           <Property Name="WorkFlowId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="BlogUser" Relationship="Self.FK_BlogPost_BlogUsers" FromRole="BlogPosts" ToRole="BlogUsers" />
-          <NavigationProperty Name="WorkFlowStep" Relationship="Self.FK_BlogPost_WorkFlowStep" FromRole="BlogPosts" ToRole="WorkFlowSteps" />
+          <NavigationProperty Name="BlogUser" Relationship="Self.FK_BlogPost_BlogUsers" FromRole="BlogPost" ToRole="BlogUsers" />
+          <NavigationProperty Name="WorkFlowStep" Relationship="Self.FK_BlogPost_WorkFlowStep" FromRole="BlogPost" ToRole="WorkFlowStep" />
         </EntityType>
         <EntityType Name="BlogUser">
           <Key>
@@ -176,8 +179,8 @@
           <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="RoleId" Type="Int32" Nullable="false" />
           <Property Name="IsActive" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="BlogPosts" Relationship="Self.FK_BlogPost_BlogUsers" FromRole="BlogUsers" ToRole="BlogPosts" />
-          <NavigationProperty Name="UserRole" Relationship="Self.FK_BlogUsers_Profiles" FromRole="BlogUsers" ToRole="UserRoles" />
+          <NavigationProperty Name="BlogPosts" Relationship="Self.FK_BlogPost_BlogUsers" FromRole="BlogUsers" ToRole="BlogPost" />
+          <NavigationProperty Name="UserRole" Relationship="Self.FK_BlogUsers_Profiles" FromRole="BlogUsers" ToRole="UserRole" />
         </EntityType>
         <EntityType Name="UserRole">
           <Key>
@@ -185,8 +188,8 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="RoleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="BlogUsers" Relationship="Self.FK_BlogUsers_Profiles" FromRole="UserRoles" ToRole="BlogUsers" />
-          <NavigationProperty Name="WorkFlowSteps" Relationship="Self.UserWorkFlowRoles" FromRole="UserRoles" ToRole="WorkFlowSteps" />
+          <NavigationProperty Name="BlogUsers" Relationship="Self.FK_BlogUsers_Profiles" FromRole="UserRole" ToRole="BlogUsers" />
+          <NavigationProperty Name="WorkFlowSteps" Relationship="Self.UserWorkFlowRole" FromRole="UserRole" ToRole="WorkFlowStep" />
         </EntityType>
         <EntityType Name="WorkFlowStep">
           <Key>
@@ -194,38 +197,38 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="WorkFlow" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="BlogPosts" Relationship="Self.FK_BlogPost_WorkFlowStep" FromRole="WorkFlowSteps" ToRole="BlogPosts" />
-          <NavigationProperty Name="UserRoles" Relationship="Self.UserWorkFlowRoles" FromRole="WorkFlowSteps" ToRole="UserRoles" />
+          <NavigationProperty Name="BlogPosts" Relationship="Self.FK_BlogPost_WorkFlowStep" FromRole="WorkFlowStep" ToRole="BlogPost" />
+          <NavigationProperty Name="UserRoles" Relationship="Self.UserWorkFlowRole" FromRole="WorkFlowStep" ToRole="UserRole" />
         </EntityType>
         <Association Name="FK_BlogPost_BlogUsers">
           <End Role="BlogUsers" Type="Self.BlogUser" Multiplicity="1" />
-          <End Role="BlogPosts" Type="Self.BlogPost" Multiplicity="*" />
+          <End Role="BlogPost" Type="Self.BlogPost" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="BlogUsers">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="BlogPosts">
+            <Dependent Role="BlogPost">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_BlogPost_WorkFlowStep">
-          <End Role="WorkFlowSteps" Type="Self.WorkFlowStep" Multiplicity="1" />
-          <End Role="BlogPosts" Type="Self.BlogPost" Multiplicity="*" />
+          <End Role="WorkFlowStep" Type="Self.WorkFlowStep" Multiplicity="1" />
+          <End Role="BlogPost" Type="Self.BlogPost" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="WorkFlowSteps">
+            <Principal Role="WorkFlowStep">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="BlogPosts">
+            <Dependent Role="BlogPost">
               <PropertyRef Name="WorkFlowId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_BlogUsers_Profiles">
-          <End Role="UserRoles" Type="Self.UserRole" Multiplicity="1" />
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
           <End Role="BlogUsers" Type="Self.BlogUser" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="UserRoles">
+            <Principal Role="UserRole">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="BlogUsers">
@@ -233,9 +236,9 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="UserWorkFlowRoles">
-          <End Role="UserRoles" Type="Self.UserRole" Multiplicity="*" />
-          <End Role="WorkFlowSteps" Type="Self.WorkFlowStep" Multiplicity="*" />
+        <Association Name="UserWorkFlowRole">
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="*" />
+          <End Role="WorkFlowStep" Type="Self.WorkFlowStep" Multiplicity="*" />
         </Association>
         <EntityContainer Name="SimpleBlogContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="BlogPosts" EntityType="Self.BlogPost" />
@@ -244,19 +247,19 @@
           <EntitySet Name="WorkFlowSteps" EntityType="Self.WorkFlowStep" />
           <AssociationSet Name="FK_BlogPost_BlogUsers" Association="Self.FK_BlogPost_BlogUsers">
             <End Role="BlogUsers" EntitySet="BlogUsers" />
-            <End Role="BlogPosts" EntitySet="BlogPosts" />
+            <End Role="BlogPost" EntitySet="BlogPosts" />
           </AssociationSet>
           <AssociationSet Name="FK_BlogPost_WorkFlowStep" Association="Self.FK_BlogPost_WorkFlowStep">
-            <End Role="WorkFlowSteps" EntitySet="WorkFlowSteps" />
-            <End Role="BlogPosts" EntitySet="BlogPosts" />
+            <End Role="WorkFlowStep" EntitySet="WorkFlowSteps" />
+            <End Role="BlogPost" EntitySet="BlogPosts" />
           </AssociationSet>
           <AssociationSet Name="FK_BlogUsers_Profiles" Association="Self.FK_BlogUsers_Profiles">
-            <End Role="UserRoles" EntitySet="UserRoles" />
+            <End Role="UserRole" EntitySet="UserRoles" />
             <End Role="BlogUsers" EntitySet="BlogUsers" />
           </AssociationSet>
-          <AssociationSet Name="UserWorkFlowRoles" Association="Self.UserWorkFlowRoles">
-            <End Role="UserRoles" EntitySet="UserRoles" />
-            <End Role="WorkFlowSteps" EntitySet="WorkFlowSteps" />
+          <AssociationSet Name="UserWorkFlowRole" Association="Self.UserWorkFlowRole">
+            <End Role="UserRole" EntitySet="UserRoles" />
+            <End Role="WorkFlowStep" EntitySet="WorkFlowSteps" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -267,7 +270,7 @@
         <EntityContainerMapping StorageEntityContainer="SimpleBlogModelStoreContainer" CdmEntityContainer="SimpleBlogContext">
           <EntitySetMapping Name="BlogPosts">
             <EntityTypeMapping TypeName="SimpleBlogModel.BlogPost">
-              <MappingFragment StoreEntitySet="BlogPosts">
+              <MappingFragment StoreEntitySet="BlogPost">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="BannerImage" ColumnName="BannerImage" />
@@ -295,7 +298,7 @@
           </EntitySetMapping>
           <EntitySetMapping Name="UserRoles">
             <EntityTypeMapping TypeName="SimpleBlogModel.UserRole">
-              <MappingFragment StoreEntitySet="UserRoles">
+              <MappingFragment StoreEntitySet="UserRole">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="RoleName" ColumnName="RoleName" />
               </MappingFragment>
@@ -303,17 +306,17 @@
           </EntitySetMapping>
           <EntitySetMapping Name="WorkFlowSteps">
             <EntityTypeMapping TypeName="SimpleBlogModel.WorkFlowStep">
-              <MappingFragment StoreEntitySet="WorkFlowSteps">
+              <MappingFragment StoreEntitySet="WorkFlowStep">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="WorkFlow" ColumnName="WorkFlow" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="UserWorkFlowRoles" TypeName="SimpleBlogModel.UserWorkFlowRoles" StoreEntitySet="UserWorkFlowRoles">
-            <EndProperty Name="UserRoles">
+          <AssociationSetMapping Name="UserWorkFlowRole" TypeName="SimpleBlogModel.UserWorkFlowRole" StoreEntitySet="UserWorkFlowRole">
+            <EndProperty Name="UserRole">
               <ScalarProperty Name="Id" ColumnName="UserRoleId" />
             </EndProperty>
-            <EndProperty Name="WorkFlowSteps">
+            <EndProperty Name="WorkFlowStep">
               <ScalarProperty Name="Id" ColumnName="WorkFlowStepId" />
             </EndProperty>
           </AssociationSetMapping>

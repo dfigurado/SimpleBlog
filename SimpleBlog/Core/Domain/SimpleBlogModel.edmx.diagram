@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9f07958c3a04402696fa45a9405c7132" Name="Diagram1">
+      <Diagram DiagramId="757e900fedfe425090b27447f3eb4812" Name="Diagram1">
         <EntityTypeShape EntityType="SimpleBlogModel.BlogPost" Width="1.5" PointX="5.25" PointY="2.375" IsExpanded="true" />
         <EntityTypeShape EntityType="SimpleBlogModel.BlogUser" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SimpleBlogModel.UserRole" Width="1.5" PointX="0.75" PointY="3" IsExpanded="true" />
@@ -12,7 +12,7 @@
         <AssociationConnector Association="SimpleBlogModel.FK_BlogPost_BlogUsers" ManuallyRouted="false" />
         <AssociationConnector Association="SimpleBlogModel.FK_BlogPost_WorkFlowStep" ManuallyRouted="false" />
         <AssociationConnector Association="SimpleBlogModel.FK_BlogUsers_Profiles" ManuallyRouted="false" />
-        <AssociationConnector Association="SimpleBlogModel.UserWorkFlowRoles" ManuallyRouted="false" />
+        <AssociationConnector Association="SimpleBlogModel.UserWorkFlowRole" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

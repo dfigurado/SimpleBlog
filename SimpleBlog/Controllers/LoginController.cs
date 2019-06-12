@@ -12,13 +12,12 @@ namespace SimpleBlog.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
-
+        UnitOfWork _unitOfWork =  new UnitOfWork(new SimpleBlogContext());
 
         //Default Constructor
         public LoginController() { }
 
-        public LoginController(IUnitOfWork unitOfWork)
+        public LoginController(UnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -35,12 +34,12 @@ namespace SimpleBlog.Controllers
             {
                 return View(model);
             }
-            var user = _unitOfWork.Users.GetAll().Where(u => u.Email == model.Email).Where(u => u.Password == model.Password);
+            var user = _unitOfWork.Users.GetUserByEmailAndPassword(model.Email, model.Password);
 
             if(user != null)
             {
                 Session["CurrentUser"] = user;
-                return View("/Account/Dashboard");
+                return RedirectToAction("Index", "Dashboard");
             }
             else
             {
@@ -48,11 +47,6 @@ namespace SimpleBlog.Controllers
             }
 
             return View("Login");
-        }
-
-        public ActionResult UserDashBoard()
-        {
-            return View();
         }
     }
 }
