@@ -2,6 +2,18 @@
 @{
     ViewBag.Title = "Index";
 }
-
+@{ 
+    SimpleBlog.Core.Domain.BlogUser blogUser = new SimpleBlog.Core.Domain.BlogUser();
+    if(Session["CurrentUser"] != null)
+    {
+        blogUser = (SimpleBlog.Core.Domain.BlogUser)Session["CurrentUser"];
+    }
+}
 <h2>Index</h2>
+
+<div class="modal-content">
+    <span>@blogUser.Name</span>
+    <span></span>
+
+</div>
 

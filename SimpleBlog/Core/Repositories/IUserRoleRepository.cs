@@ -9,6 +9,6 @@ namespace SimpleBlog.Core.Repositories
 {
     public interface IUserRoleRepository : IRepository<UserRole>
     {
-       
+        IEnumerable<UserRole> GetUserRoleWithWorkFlow(int id); 
     }
 }

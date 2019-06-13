@@ -19,5 +19,10 @@ namespace SimpleBlog.Persistence.Repositories
         {
             get { return Context as SimpleBlogContext; }
         }
+
+        public IEnumerable<UserRole> GetUserRoleWithWorkFlow(int id)
+        {
+            return SimpleBlogContext.UserRoles.Include(u => u.WorkFlowSteps).Where(u => u.Id == id);
+        }
     }
 }
